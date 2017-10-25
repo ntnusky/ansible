@@ -1,0 +1,35 @@
+- hosts: bjarneskvms_ubuntu
+  remote_user: ubuntu
+  tasks:
+  
+  - name: copy ubuntu credentials to root
+    become: true
+    become_user: root
+    copy:
+        src: /home/ubuntu/.ssh/authorized_keys
+        dest: /root/.ssh/
+        remote_src: yes
+        owner: root
+        group: root
+        mode: 0400
+    when:
+      - ansible_distribution == "Ubuntu"
+
+- hosts: bjarneskvms_centos
+  remote_user: centos
+  tasks:
+
+  - name: copy centos credentials to root
+    become: true
+    become_user: root
+    copy:
+        src: /home/centos/.ssh/authorized_keys
+        dest: /root/.ssh/
+        remote_src: yes
+        owner: root
+        group: root
+        mode: 0400
+    when:
+      - ansible_distribution == "CentOS"
+    
+      

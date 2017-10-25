@@ -1,0 +1,72 @@
+- hosts: bjarneskvms_ubuntu
+  remote_user: root
+  tasks:
+  - copy:
+      src: files/nscd.conf
+      dest: /etc/nscd.conf
+      owner: root
+      group: root
+      mode: 0600
+    register: nscd_config
+
+  - copy:
+      src: files/nslcd.conf
+      dest: /etc/nslcd.conf
+      owner: root
+      group: root
+      mode: 0400
+    register: nslcd_config
+
+  - copy:
+      src: files/nsswitch.conf
+      dest: /etc/nsswitch.conf
+      owner: root
+      group: root
+      mode: 0400
+    register: nscd_config
+
+  - service:
+      name: nscd
+      state: restarted
+    when: nscd_config.changed
+
+  - service:
+      name: nslcd
+      state: restarted
+    when: nslcd_config.changed
+
+  - name: install latest libnss-ldapd
+    package:
+      name:  libnss-ldapd
+      state: latest
+
+  - name: Allow passwords
+    lineinfile:
+      dest=/etc/ssh/sshd_config
+      backup=yes 
+      regexp="^PasswordAuthentication"
+      line="PasswordAuthentication yes"
+    #  state=present
+    register: sshd_config
+
+  - name: Only allow some users
+    lineinfile:
+      dest=/etc/ssh/sshd_config
+      backup=yes
+      regexp="^AllowUsers"
+      line="AllowUsers root ubuntu einjen"
+    register: sshd_config
+
+  - service:
+      name: sshd
+      state: restarted
+    when: sshd_config.changed
+
+#    ini_file: dest=/etc/ssh/sshd_conf section=null option=PasswordAuthentication value=yes backup=yes
+#    tags: configuration
+#  tasks:
+#  - shell: "ls -lah" 
+#    register: result
+#
+#  - debug: var="result.stdout_lines + [ result.stderr ]" 
+

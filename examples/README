@@ -1,0 +1,8 @@
+These examples require /etc/ansible/hosts set up with the following sections
+
+[bjarneskvms_ubuntu]
+<ip list of vm's with ubuntu>
+[bjarneskvms_centos]
+<ip list of vm's with centos
+[bjarneskvms]
+<ip list of all vm's>
